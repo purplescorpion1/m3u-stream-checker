@@ -13,4 +13,4 @@ Note if the script is not in the same location as the m3u file put the full path
 
 ### How to run
 ``` python m3ucheck.py ``` <br>
-Output of Working or Failed streams will output in the console and will also be saved to stream_status.txt
+Result of Working or Failed streams will output in the console and will also be saved to stream_status.txt
