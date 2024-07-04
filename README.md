@@ -12,5 +12,5 @@ Change files.m3u at the bottom of the file to the name of your m3u file <br>
 Note if the script is not in the same location as the m3u file put the full path to the file
 
 ### How to run
-``` python m3ucheck.py ```
+``` python m3ucheck.py ``` <br>
 Output of Working or Failed streams will output in the console and will also be saved to stream_status.txt
