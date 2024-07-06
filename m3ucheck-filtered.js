@@ -23,9 +23,9 @@ function parseM3U(m3uContent) {
             currentStream.name = info.split(',')[1] || ''; // Get channel name from #EXTINF
             currentStream.info = line; // Store the whole #EXTINF line
         } else if (line.startsWith('#EXTVLCOPT:http-referrer=')) {
-            currentStream.referrer = line.substring(24).trim();
+            currentStream.referrer = line; // Store the whole #EXTVLCOPT line
         } else if (line.startsWith('#EXTVLCOPT:http-user-agent=')) {
-            currentStream.userAgent = line.substring(25).trim();
+            currentStream.userAgent = line; // Store the whole #EXTVLCOPT line
         } else if (line.startsWith('http')) {
             currentStream.url = line.trim();
             streams.push(currentStream);
@@ -89,17 +89,20 @@ function appendResult(result) {
 }
 
 function killVLCProcess(pid) {
-    console.log(`Killing VLC process with PID ${pid}`);
     if (process.platform === 'win32') {
         // Windows-specific termination
         exec(`taskkill /pid ${pid} /f /t`, (err, stdout, stderr) => {
             if (err) {
-                console.error(`Error killing process ${pid}: ${err}`);
+                // Suppress the error log
             }
         });
     } else {
         // Linux and other Unix-like OS
-        process.kill(pid, 'SIGKILL');
+        try {
+            process.kill(pid, 'SIGKILL');
+        } catch (err) {
+            // Suppress the error log
+        }
     }
 }
 
@@ -107,7 +110,10 @@ function createFilteredM3UFile(streams) {
     let m3uContent = '#EXTM3U\n';
 
     streams.forEach(stream => {
-        m3uContent += `${stream.info}\n${stream.url}\n`;
+        m3uContent += `${stream.info}\n`;
+        if (stream.referrer) m3uContent += `${stream.referrer}\n`;
+        if (stream.userAgent) m3uContent += `${stream.userAgent}\n`;
+        m3uContent += `${stream.url}\n`;
     });
 
     fs.writeFileSync(filteredM3UFilePath, m3uContent, (err) => {
@@ -170,17 +176,20 @@ fs.readFile(m3uFilePath, 'utf8', async (err, data) => {
 
 function killVLCProcesses() {
     vlcProcesses.forEach(vlcProcess => {
-        console.log(`Killing VLC process with PID ${vlcProcess.pid}`);
         if (process.platform === 'win32') {
             // Windows-specific termination
             exec(`taskkill /pid ${vlcProcess.pid} /f /t`, (err, stdout, stderr) => {
                 if (err) {
-                    console.error(`Error killing process ${vlcProcess.pid}: ${err}`);
+                    // Suppress the error log
                 }
             });
         } else {
             // Linux and other Unix-like OS
-            process.kill(vlcProcess.pid, 'SIGKILL');
+            try {
+                process.kill(vlcProcess.pid, 'SIGKILL');
+            } catch (err) {
+                // Suppress the error log
+            }
         }
     });
 }
