@@ -1,10 +1,13 @@
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const { setTimeout } = require('timers/promises');
 
 const m3uFilePath = 'file.m3u'; // Replace with your M3U file path
 const vlcTimeout = 10000; // 10 seconds timeout for VLC to start playing the stream
 const resultFilePath = 'stream_results.txt';
+
+// Array to hold references to all spawned VLC processes
+let vlcProcesses = [];
 
 function parseM3U(m3uContent) {
     let lines = m3uContent.split('\n');
@@ -34,6 +37,7 @@ async function checkStream(stream) {
     let vlcCommand = `vlc --intf dummy --no-video --play-and-exit "${stream.url}"`;
 
     let vlcProcess = spawn(vlcCommand, [], { shell: true });
+    vlcProcesses.push({ pid: vlcProcess.pid, process: vlcProcess }); // Store PID and reference to the VLC process
 
     let timeoutPromise = setTimeout(vlcTimeout);
 
@@ -67,7 +71,8 @@ async function checkStream(stream) {
         console.error(`${stream.name} - failed (error: ${err.message})`);
         appendResult(`${stream.name} - failed (error: ${err.message})`);
     } finally {
-        vlcProcess.kill();
+        // Kill the VLC process
+        killVLCProcess(vlcProcess.pid);
     }
 }
 
@@ -77,6 +82,21 @@ function appendResult(result) {
             console.error('Error appending to stream_results.txt:', err);
         }
     });
+}
+
+function killVLCProcess(pid) {
+    console.log(`Killing VLC process with PID ${pid}`);
+    if (process.platform === 'win32') {
+        // Windows-specific termination
+        exec(`taskkill /pid ${pid} /f /t`, (err, stdout, stderr) => {
+            if (err) {
+                console.error(`Error killing process ${pid}: ${err}`);
+            }
+        });
+    } else {
+        // Linux and other Unix-like OS
+        process.kill(pid, 'SIGKILL');
+    }
 }
 
 // Check if the result file exists and delete it if it does
@@ -108,6 +128,25 @@ fs.readFile(m3uFilePath, 'utf8', async (err, data) => {
 
     console.log('All streams checked.');
 
-    // Close VLC or perform cleanup here if needed
+    // Kill all VLC processes at the end of script execution
+    killVLCProcesses();
+
     process.exit(0); // Ensure script terminates after all streams are checked
 });
+
+function killVLCProcesses() {
+    vlcProcesses.forEach(vlcProcess => {
+        console.log(`Killing VLC process with PID ${vlcProcess.pid}`);
+        if (process.platform === 'win32') {
+            // Windows-specific termination
+            exec(`taskkill /pid ${vlcProcess.pid} /f /t`, (err, stdout, stderr) => {
+                if (err) {
+                    console.error(`Error killing process ${vlcProcess.pid}: ${err}`);
+                }
+            });
+        } else {
+            // Linux and other Unix-like OS
+            process.kill(vlcProcess.pid, 'SIGKILL');
+        }
+    });
+}
