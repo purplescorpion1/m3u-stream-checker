@@ -1,5 +1,5 @@
 # m3u Stream Checker & Filter
-A Script To Check If The Streams In An m3u File Are Working
+A script to check if the streams in a m3u file are working and filter working streams into a new m3u 
 
 ### Requirements
 Node.js <br>
