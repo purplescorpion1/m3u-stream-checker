@@ -21,4 +21,5 @@ Result of Working or Failed streams will output in the console and will also be 
 <br>
 Check and filter working streams to new m3u <br>
 ``` node m3ucheck-filtered.js ``` <br>
+Result of Working or Failed streams will output in the console and will also be saved to stream_results.txt <br>
 New m3u will be outputted to [name_of_orig_m3u]-filtered.m3u
