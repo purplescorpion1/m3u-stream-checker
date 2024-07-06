@@ -13,7 +13,7 @@ If it displays the version number than you are good to go <br>
 ``` git clone https://github.com/purplescorpion1/m3u-stream-checker-and-filter.git ``` <br>
 ``` cd m3u-stream-checker-and-filter ``` <br>
 Open m3ucheck.js and/or m3ucheck-filtered.js with notepad++ or any code text editor <br>
-Change files.m3u at the top of the script to the name of your m3u file <br>
+Change file.m3u at the top of the script to the name of your m3u file <br>
 Note if the script is not in the same location as the m3u file put the full path to the file <br>
 
 ### How to run
