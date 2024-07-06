@@ -1,4 +1,4 @@
-# m3u Stream Checker
+# m3u Stream Checker & Filter
 A Script To Check If The Streams In An m3u File Are Working
 
 ### Requirements
